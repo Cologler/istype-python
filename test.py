@@ -20,7 +20,9 @@ from typing import (
     AnyStr,
     Set,
     Dict,
-    Type
+    Type,
+    Iterable,
+    Collection
 )
 
 class Test(unittest.TestCase):
@@ -75,6 +77,20 @@ class Test(unittest.TestCase):
         self.assertTrue(ISA(TeamUser, Type[User]))
         self.assertFalse(ISA(str, Type[User]))
         self.assertTrue(ISA(str, Type[Any]))
+
+    def test_iterable(self):
+        self.assertTrue(ISA([], Iterable[int]))
+        self.assertTrue(ISA([1, 1], Iterable[int]))
+        self.assertTrue(ISA([1, '1'], Iterable[int], check_item=False))
+        self.assertFalse(ISA([1, '1'], Iterable[int], check_item=True))
+        self.assertTrue(ISA([1, '1'], Iterable[object]))
+
+    def test_collection(self):
+        self.assertTrue(ISA([], Collection[int]))
+        self.assertTrue(ISA([1, 1], Collection[int]))
+        self.assertTrue(ISA([1, '1'], Collection[int], check_item=False))
+        self.assertFalse(ISA([1, '1'], Collection[int], check_item=True))
+        self.assertTrue(ISA([1, '1'], Collection[object]))
 
 
 def main(argv=None):

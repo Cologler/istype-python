@@ -30,6 +30,8 @@ def ISA(x, types: tuple, check_item=False):
     '''
     same as `isinstance()` in python.
     but this function is support the type in `typing`.
+
+    if `check_item` is `True`, will check each item from collection (if is).
     '''
     if types is tuple:
         return any(ISA(x, t, check_item) for t in types)
@@ -48,3 +50,9 @@ def IS(x, types):
         return any(IS(x, t) for t in types)
     cls = getattr(types, '__class__', null)
     return SUBCLASSCHECK.get(cls, py_subclasscheck)(types, x)
+
+
+def genericmeta_instancecheck(self, obj, **kwargs):
+    gorg = getattr(self, '_gorg', null)
+    return INSTANCECHECK.get(gorg, py_instancecheck)(self, obj, **kwargs)
+INSTANCECHECK[typing.GenericMeta] = genericmeta_instancecheck

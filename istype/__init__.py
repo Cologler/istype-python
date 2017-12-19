@@ -6,10 +6,13 @@
 #
 # ----------
 
-from .any import typing
 from .common import ISA, IS
+
+# for init all module:
+from .any import typing
+from .collection import typing
 from .dict import typing
-from .genericmeta import typing
+from .iterable import typing
 from .typevar import typing
 from .list import typing
 from .set import typing

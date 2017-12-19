@@ -26,3 +26,5 @@ ISA(1, Union[int, str]) # now it will return True
 * Set
 * Dict
 * Type
+* Iterable
+* Collection
