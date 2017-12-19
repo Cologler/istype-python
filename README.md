@@ -10,10 +10,9 @@ However, we cannot use `isinstance()` for test it.
 So...
 
 ``` py
-import typing_instancecheck
-typing_instancecheck.install_all()
+from istype import ISA
 
-isinstance(1, Union[int, str]) # now it will return True
+ISA(1, Union[int, str]) # now it will return True
 ```
 
 ## Supported types
@@ -26,6 +25,4 @@ isinstance(1, Union[int, str]) # now it will return True
 * AnyStr
 * Set
 * Dict
-
-
-
+* Type
