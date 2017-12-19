@@ -15,18 +15,10 @@ SUBCLASSCHECK = {}
 null = object()
 
 def py_instancecheck(self, obj, **kwargs):
-    try:
-        return isinstance(obj, self)
-    except TypeError:
-        print('crash self={}, obj={}'.format(self, obj))
-        raise
+    return isinstance(obj, self)
 
 def py_subclasscheck(self, obj, **kwargs):
-    try:
-        return issubclass(obj, self)
-    except TypeError:
-        print('crash self={}, obj={}'.format(self, obj))
-        raise
+    return issubclass(obj, self)
 
 def ISA(x, types: tuple,
         check_item=False,
