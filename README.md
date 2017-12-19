@@ -1,4 +1,4 @@
-# typing instancecheck
+# istype
 
 After python 3.5, we got a `typing` module.
 
