@@ -15,6 +15,8 @@ from istype import ISA
 ISA(1, Union[int, str]) # now it will return True
 ```
 
+try use `from istype import ISA as isinstance` !
+
 ## Supported types
 
 * Union
