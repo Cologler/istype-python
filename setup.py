@@ -33,7 +33,7 @@ setup(
     license = 'MIT',
     packages = ['istype'],
     include_package_data = True,
-    zip_safe = True,
+    zip_safe = False,
     install_requires = [],
     entry_points = {},
 )
