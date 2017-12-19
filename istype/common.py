@@ -7,9 +7,11 @@
 # ----------
 
 import typing
+import collections.abc as abccol
 
 INSTANCECHECK = {}
 SUBCLASSCHECK = {}
+
 null = object()
 
 def py_instancecheck(self, obj, **kwargs):
@@ -52,7 +54,25 @@ def IS(x, types):
     return SUBCLASSCHECK.get(cls, py_subclasscheck)(types, x)
 
 
+# generic collection check:
+
+INSTANCECHECK_COLLECTION_TYPE_MAP = {
+    typing.List: list,
+    typing.Set: set,
+    typing.FrozenSet: frozenset,
+    typing.Collection: abccol.Collection,
+}
+
 def genericmeta_instancecheck(self, obj, **kwargs):
     gorg = getattr(self, '_gorg', null)
-    return INSTANCECHECK.get(gorg, py_instancecheck)(self, obj, **kwargs)
+    func = INSTANCECHECK.get(gorg, null)
+    if func is not null:
+        return func(self, obj, **kwargs)
+    coltype = INSTANCECHECK_COLLECTION_TYPE_MAP.get(gorg, null)
+    if coltype is not null:
+        if not isinstance(obj, coltype):
+            return False
+        typ, = self.__args__
+        return not kwargs.get('check_item') or all(ISA(x, typ) for x in obj)
+    return py_instancecheck(self, obj, **kwargs)
 INSTANCECHECK[typing.GenericMeta] = genericmeta_instancecheck
