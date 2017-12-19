@@ -22,7 +22,8 @@ from typing import (
     Dict,
     Type,
     Iterable,
-    Collection
+    Collection,
+    T
 )
 
 class Test(unittest.TestCase):
@@ -91,6 +92,29 @@ class Test(unittest.TestCase):
         self.assertTrue(ISA([1, '1'], Collection[int], check_item=False))
         self.assertFalse(ISA([1, '1'], Collection[int], check_item=True))
         self.assertTrue(ISA([1, '1'], Collection[object]))
+
+    def test_typevar(self):
+        self.assertTrue(ISA([1], List[T], check_item=True, typevar_table={'T': int}))
+        self.assertFalse(ISA([str], List[T], check_item=True, typevar_table={'T': int}))
+
+    def test_typevar_buildtable(self):
+        # case 1
+        table = {}
+        self.assertFalse(ISA([1, '1'], List[T], check_item=True, typevar_table=table))
+        self.assertTrue(len(table) == 1)
+        for k in table:
+            v = table[k]
+            self.assertEqual(k, 'T')
+            self.assertEqual(v, int)
+
+        # case 2
+        table = {}
+        self.assertTrue(ISA([1, 1], List[T], check_item=True, typevar_table=table))
+        self.assertTrue(len(table) == 1)
+        for k in table:
+            v = table[k]
+            self.assertEqual(k, 'T')
+            self.assertEqual(v, int)
 
 
 def main(argv=None):

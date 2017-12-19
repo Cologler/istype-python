@@ -17,5 +17,13 @@ def instancecheck(self, obj, **kwargs):
         raise NotImplementedError
     if self.__contravariant__:
         raise NotImplementedError
+    typevar_table = kwargs.get('typevar_table')
+    if isinstance(typevar_table, dict):
+        typed = typevar_table.get(self.__name__, None)
+        if typed is None:
+            typevar_table[self.__name__] = type(obj)
+            return True
+        else:
+            return ISA(obj, typed)
     return True
 INSTANCECHECK[typing.TypeVar] = instancecheck

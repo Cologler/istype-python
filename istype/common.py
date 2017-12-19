@@ -28,7 +28,9 @@ def py_subclasscheck(self, obj, **kwargs):
         print('crash self={}, obj={}'.format(self, obj))
         raise
 
-def ISA(x, types: tuple, check_item=False):
+def ISA(x, types: tuple,
+        check_item=False,
+        typevar_table: typing.Dict[str, type]=None):
     '''
     same as `isinstance()` in python.
     but this function is support the type in `typing`.
@@ -36,11 +38,13 @@ def ISA(x, types: tuple, check_item=False):
     if `check_item` is `True`, will check each item from collection (if is).
     '''
     if types is tuple:
-        return any(ISA(x, t, check_item) for t in types)
+        return any(ISA(x, t, check_item, typevar_table) for t in types)
     #if not isinstance(types, type):
     #    raise TypeError('isa() arg 2 must be a type or tuple of types')
     cls = getattr(types, '__class__', null)
-    return INSTANCECHECK.get(cls, py_instancecheck)(types, x, check_item=check_item)
+    return INSTANCECHECK.get(cls, py_instancecheck)(types, x,
+        check_item=check_item,
+        typevar_table=typevar_table)
 
 
 def IS(x, types):
@@ -61,6 +65,7 @@ INSTANCECHECK_COLLECTION_TYPE_MAP = {
     typing.Set: set,
     typing.FrozenSet: frozenset,
     typing.Collection: abccol.Collection,
+    typing.Iterable: abccol.Iterable,
 }
 
 def genericmeta_instancecheck(self, obj, **kwargs):
@@ -73,6 +78,6 @@ def genericmeta_instancecheck(self, obj, **kwargs):
         if not isinstance(obj, coltype):
             return False
         typ, = self.__args__
-        return not kwargs.get('check_item') or all(ISA(x, typ) for x in obj)
+        return not kwargs.get('check_item') or all(ISA(x, typ, **kwargs) for x in obj)
     return py_instancecheck(self, obj, **kwargs)
 INSTANCECHECK[typing.GenericMeta] = genericmeta_instancecheck

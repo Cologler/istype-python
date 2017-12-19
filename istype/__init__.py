@@ -11,7 +11,6 @@ from .common import ISA, IS
 # for init all module:
 from .any import typing
 from .dict import typing
-from .iterable import typing
 from .typevar import typing
 from .tuplemeta import typing
 from .type import typing
