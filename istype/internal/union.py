@@ -7,8 +7,8 @@
 # ----------
 
 import typing
-from .common import INSTANCECHECK, ISA
+from .common import ISA
 
+@ISA.register(type(typing.Union))
 def instancecheck(self, obj, **kwargs):
     return ISA(obj, self.__args__)
-INSTANCECHECK[type(typing.Union)] = instancecheck

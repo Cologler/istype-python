@@ -7,12 +7,12 @@
 # ----------
 
 import typing
-from .common import INSTANCECHECK, SUBCLASSCHECK
+from .common import ISA, IS
 
+@ISA.register(type(typing.Any))
 def instancecheck(self, obj, **kwargs):
     return True
-INSTANCECHECK[type(typing.Any)] = instancecheck
 
+@IS.register(type(typing.Any))
 def subclasscheck(self, obj, **kwargs):
     return True
-SUBCLASSCHECK[type(typing.Any)] = subclasscheck

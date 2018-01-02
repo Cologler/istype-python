@@ -7,8 +7,9 @@
 # ----------
 
 import typing
-from .common import INSTANCECHECK, ISA
+from .common import ISA
 
+@ISA.register(typing.TypeVar)
 def instancecheck(self, obj, **kwargs):
     args = self.__constraints__
     if args:
@@ -26,4 +27,3 @@ def instancecheck(self, obj, **kwargs):
         else:
             return ISA(obj, typed)
     return True
-INSTANCECHECK[typing.TypeVar] = instancecheck

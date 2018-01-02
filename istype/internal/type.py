@@ -7,11 +7,11 @@
 # ----------
 
 import typing
-from .common import INSTANCECHECK, IS
+from .common import ISA, IS
 
+@ISA.register(typing.Type)
 def instancecheck(self, obj, **kwargs):
     if not isinstance(obj, type):
         return False
     typ, = self.__args__
     return IS(obj, typ)
-INSTANCECHECK[typing.Type] = instancecheck
