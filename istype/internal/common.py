@@ -38,7 +38,7 @@ def _register(d, *args):
         r(callback)
         return callback
 
-def ISA(x, types: tuple,
+def ISA(x, types: tuple, *,
         check_item=False,
         typevar_table: typing.Dict[str, type]=None):
     '''
@@ -47,15 +47,18 @@ def ISA(x, types: tuple,
 
     if `check_item` is `True`, will check each item from collection (if is).
     '''
+    kwargs = dict(
+        check_item=check_item,
+        typevar_table=typevar_table
+    )
     if types is tuple:
-        return any(ISA(x, t, check_item, typevar_table) for t in types)
+        return any(ISA(x, t, **kwargs) for t in types)
     #if not isinstance(types, type):
     #    raise TypeError('isa() arg 2 must be a type or tuple of types')
     cls = getattr(types, '__class__', null)
-    return _INSTANCECHECK.get(cls, py_instancecheck)(types, x,
-        check_item=check_item,
-        typevar_table=typevar_table)
+    return _INSTANCECHECK.get(cls, py_instancecheck)(types, x, **kwargs)
 ISA.register = functools.partial(_register, _INSTANCECHECK)
+
 
 def IS(x, types):
     '''

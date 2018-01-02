@@ -13,7 +13,7 @@ from .common import ISA
 def instancecheck(self, obj, **kwargs):
     args = self.__constraints__
     if args:
-        return ISA(obj, args)
+        return ISA(obj, args, **kwargs)
     if self.__covariant__:
         raise NotImplementedError
     if self.__contravariant__:
@@ -25,5 +25,5 @@ def instancecheck(self, obj, **kwargs):
             typevar_table[self.__name__] = type(obj)
             return True
         else:
-            return ISA(obj, typed)
+            return ISA(obj, typed, **kwargs)
     return True
