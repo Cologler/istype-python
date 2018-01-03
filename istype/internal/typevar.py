@@ -7,13 +7,13 @@
 # ----------
 
 import typing
-from .common import ISA, IS
+from .common import isinstanceof, issubclassof
 
-@ISA.register(typing.TypeVar)
+@isinstanceof.register(typing.TypeVar)
 def instancecheck(self, obj, **kwargs):
     args = self.__constraints__
     if args:
-        return ISA(obj, args, **kwargs)
+        return isinstanceof(obj, args, **kwargs)
     typevar_table = kwargs.get('typevar_table')
     if isinstance(typevar_table, dict):
         typed = typevar_table.get(self.__name__, None)
@@ -22,8 +22,8 @@ def instancecheck(self, obj, **kwargs):
             return True
         else:
             if self.__contravariant__:
-                return IS(typed, type(obj))
-            return ISA(obj, typed, **kwargs)
+                return issubclassof(typed, type(obj))
+            return isinstanceof(obj, typed, **kwargs)
     if self.__covariant__:
         raise NotImplementedError
     if self.__contravariant__:

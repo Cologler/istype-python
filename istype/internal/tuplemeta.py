@@ -7,9 +7,9 @@
 # ----------
 
 import typing
-from .common import ISA
+from .common import isinstanceof
 
-@ISA.register(typing.TupleMeta)
+@isinstanceof.register(typing.TupleMeta)
 def instancecheck(self, obj, **kwargs):
     if not isinstance(obj, tuple):
         return False

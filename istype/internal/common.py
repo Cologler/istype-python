@@ -38,7 +38,7 @@ def _register(d, *args):
         r(callback)
         return callback
 
-def ISA(x, types: tuple, *,
+def isinstanceof(x, types: tuple, *,
         typevar_table: typing.Dict[str, type]=None):
     '''
     same as `isinstance()` in python.
@@ -48,24 +48,24 @@ def ISA(x, types: tuple, *,
         typevar_table=typevar_table
     )
     if types is tuple:
-        return any(ISA(x, t, **kwargs) for t in types)
+        return any(isinstanceof(x, t, **kwargs) for t in types)
     #if not isinstance(types, type):
     #    raise TypeError('isa() arg 2 must be a type or tuple of types')
     cls = getattr(types, '__class__', null)
     return _INSTANCECHECK.get(cls, py_instancecheck)(types, x, **kwargs)
-ISA.register = functools.partial(_register, _INSTANCECHECK)
+isinstanceof.register = functools.partial(_register, _INSTANCECHECK)
 
 
-def IS(x, types):
+def issubclassof(x, types):
     '''
     same as `issubclass()` in python.
     but this function is support the type in `typing`.
     '''
     if types is tuple:
-        return any(IS(x, t) for t in types)
+        return any(issubclassof(x, t) for t in types)
     cls = getattr(types, '__class__', null)
     return _SUBCLASSCHECK.get(cls, py_subclasscheck)(types, x)
-IS.register = functools.partial(_register, _SUBCLASSCHECK)
+issubclassof.register = functools.partial(_register, _SUBCLASSCHECK)
 
 # generic collection check:
 
@@ -77,7 +77,7 @@ _INSTANCECHECK_COLLECTION_TYPE_MAP = {
     typing.Iterable: abccol.Iterable,
 }
 
-@ISA.register(typing.GenericMeta)
+@isinstanceof.register(typing.GenericMeta)
 def genericmeta_instancecheck(self, obj, **kwargs):
     gorg = getattr(self, '_gorg', null)
     func = _INSTANCECHECK.get(gorg, null)
@@ -88,5 +88,5 @@ def genericmeta_instancecheck(self, obj, **kwargs):
         if not isinstance(obj, coltype):
             return False
         typ, = self.__args__
-        return all(ISA(x, typ, **kwargs) for x in obj)
+        return all(isinstanceof(x, typ, **kwargs) for x in obj)
     return py_instancecheck(self, obj, **kwargs)

@@ -10,12 +10,12 @@ However, we cannot use `isinstance()` for test it.
 So...
 
 ``` py
-from istype import ISA
+from istype import isinstanceof
 
-ISA(1, Union[int, str]) # now it will return True
+isinstanceof(1, Union[int, str]) # now it will return True
 ```
 
-try use `from istype import ISA as isinstance` !
+try use `from istype import isinstanceof as isinstance` !
 
 ## Supported types
 

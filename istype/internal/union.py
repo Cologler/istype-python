@@ -7,8 +7,8 @@
 # ----------
 
 import typing
-from .common import ISA
+from .common import isinstanceof
 
-@ISA.register(type(typing.Union))
+@isinstanceof.register(type(typing.Union))
 def instancecheck(self, obj, **kwargs):
-    return ISA(obj, self.__args__)
+    return isinstanceof(obj, self.__args__)

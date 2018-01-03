@@ -7,11 +7,11 @@
 # ----------
 
 import typing
-from .common import ISA
+from .common import isinstanceof
 
-@ISA.register(typing.Dict)
+@isinstanceof.register(typing.Dict)
 def instancecheck(self, obj, **kwargs):
     if not isinstance(obj, dict):
         return False
     kt, vt = self.__args__
-    return all(ISA(k, kt) for k in obj.keys()) and all(ISA(v, vt) for v in obj.values())
+    return all(isinstanceof(k, kt) for k in obj.keys()) and all(isinstanceof(v, vt) for v in obj.values())

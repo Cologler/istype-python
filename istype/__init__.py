@@ -6,4 +6,4 @@
 #
 # ----------
 
-from .internal.common import ISA, IS
+from .internal.common import isinstanceof, issubclassof

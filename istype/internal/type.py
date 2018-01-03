@@ -7,11 +7,11 @@
 # ----------
 
 import typing
-from .common import ISA, IS
+from .common import isinstanceof, issubclassof
 
-@ISA.register(typing.Type)
+@isinstanceof.register(typing.Type)
 def instancecheck(self, obj, **kwargs):
     if not isinstance(obj, type):
         return False
     typ, = self.__args__
-    return IS(obj, typ)
+    return issubclassof(obj, typ)
