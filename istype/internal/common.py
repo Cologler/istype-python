@@ -39,16 +39,12 @@ def _register(d, *args):
         return callback
 
 def ISA(x, types: tuple, *,
-        check_item=False,
         typevar_table: typing.Dict[str, type]=None):
     '''
     same as `isinstance()` in python.
     but this function is support the type in `typing`.
-
-    if `check_item` is `True`, will check each item from collection (if is).
     '''
     kwargs = dict(
-        check_item=check_item,
         typevar_table=typevar_table
     )
     if types is tuple:
@@ -92,5 +88,5 @@ def genericmeta_instancecheck(self, obj, **kwargs):
         if not isinstance(obj, coltype):
             return False
         typ, = self.__args__
-        return not kwargs.get('check_item') or all(ISA(x, typ, **kwargs) for x in obj)
+        return all(ISA(x, typ, **kwargs) for x in obj)
     return py_instancecheck(self, obj, **kwargs)

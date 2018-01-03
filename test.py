@@ -46,10 +46,9 @@ class Test(unittest.TestCase):
         self.assertFalse(ISA((1, 1), Tuple[int, str]))
 
     def test_list(self):
-        self.assertTrue(ISA([], List[int]))
+        self.assertTrue(ISA([1, '1'], list))
         self.assertTrue(ISA([1, 1], List[int]))
-        self.assertTrue(ISA([1, '1'], List[int], check_item=False))
-        self.assertFalse(ISA([1, '1'], List[int], check_item=True))
+        self.assertFalse(ISA([1, '1'], List[int]))
         self.assertTrue(ISA([1, '1'], List[object]))
 
     def test_anystr(self):
@@ -58,13 +57,13 @@ class Test(unittest.TestCase):
         self.assertTrue(ISA(b'1', AnyStr))
 
     def test_set(self):
-        self.assertTrue(ISA(set([1, '2']), Set[int], check_item=False))
-        self.assertFalse(ISA(set([1, '2']), Set[int], check_item=True))
+        self.assertTrue(ISA(set([1, '2']), set))
+        self.assertFalse(ISA(set([1, '2']), Set[int]))
         self.assertTrue(ISA(set([1, 2]), Set[int]))
 
     def test_dict(self):
-        self.assertTrue(ISA({'2': 1}, Dict[int, str], check_item=False))
-        self.assertFalse(ISA({'2': 1}, Dict[int, str], check_item=True))
+        self.assertTrue(ISA({'2': 1}, dict))
+        self.assertFalse(ISA({'2': 1}, Dict[int, str]))
         self.assertTrue(ISA({1: '2'}, Dict[int, str]))
 
     def test_type(self):
@@ -82,25 +81,25 @@ class Test(unittest.TestCase):
     def test_iterable(self):
         self.assertTrue(ISA([], Iterable[int]))
         self.assertTrue(ISA([1, 1], Iterable[int]))
-        self.assertTrue(ISA([1, '1'], Iterable[int], check_item=False))
-        self.assertFalse(ISA([1, '1'], Iterable[int], check_item=True))
+        self.assertTrue(ISA([1, '1'], list))
+        self.assertFalse(ISA([1, '1'], Iterable[int]))
         self.assertTrue(ISA([1, '1'], Iterable[object]))
 
     def test_collection(self):
         self.assertTrue(ISA([], Collection[int]))
         self.assertTrue(ISA([1, 1], Collection[int]))
-        self.assertTrue(ISA([1, '1'], Collection[int], check_item=False))
-        self.assertFalse(ISA([1, '1'], Collection[int], check_item=True))
+        self.assertTrue(ISA([1, '1'], list))
+        self.assertFalse(ISA([1, '1'], Collection[int]))
         self.assertTrue(ISA([1, '1'], Collection[object]))
 
     def test_typevar(self):
-        self.assertTrue(ISA([1], List[T], check_item=True, typevar_table={'T': int}))
-        self.assertFalse(ISA([str], List[T], check_item=True, typevar_table={'T': int}))
+        self.assertTrue(ISA([1], List[T], typevar_table={'T': int}))
+        self.assertFalse(ISA([str], List[T], typevar_table={'T': int}))
 
     def test_typevar_buildtable(self):
         # case 1
         table = {}
-        self.assertFalse(ISA([1, '1'], List[T], check_item=True, typevar_table=table))
+        self.assertFalse(ISA([1, '1'], List[T], typevar_table=table))
         self.assertTrue(len(table) == 1)
         for k in table:
             v = table[k]
@@ -109,7 +108,7 @@ class Test(unittest.TestCase):
 
         # case 2
         table = {}
-        self.assertTrue(ISA([1, 1], List[T], check_item=True, typevar_table=table))
+        self.assertTrue(ISA([1, 1], List[T], typevar_table=table))
         self.assertTrue(len(table) == 1)
         for k in table:
             v = table[k]
