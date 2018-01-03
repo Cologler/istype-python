@@ -23,7 +23,8 @@ from typing import (
     Type,
     Iterable,
     Collection,
-    T
+    T,
+    Callable
 )
 
 class Test(unittest.TestCase):
@@ -114,6 +115,51 @@ class Test(unittest.TestCase):
             v = table[k]
             self.assertEqual(k, 'T')
             self.assertEqual(v, int)
+
+    def test_callable(self):
+        def func0(arg1): pass
+        self.assertTrue(isinstanceof(func0, Callable))
+
+        def func1(arg1: str, arg2: int) -> int: pass
+        self.assertTrue(isinstanceof(func1, Callable))
+        self.assertTrue(isinstanceof(func1, Callable[[str, int], int]))
+        self.assertFalse(isinstanceof(func1, Callable[[str, str], int]))
+
+        def func2(arg1: (str, int), arg2: int) -> int: pass
+        self.assertTrue(isinstanceof(func2, Callable[[str, int], int]))
+
+    def test_callable_covariant(self):
+        class A: pass
+        class B: pass
+        class C(B): pass
+        class D(C): pass
+
+        def func1(arg1: A, arg2: B) -> C:
+            pass
+
+        self.assertTrue(isinstanceof(func1, Callable[[A, B], C]))
+        self.assertFalse(isinstanceof(func1, Callable[[A, A], C]))
+
+        def func2(arg1: C):
+            pass
+
+        self.assertFalse(isinstanceof(func2, Callable[[B], None]))
+        self.assertTrue(isinstanceof(func2, Callable[[C], None]))
+        self.assertTrue(isinstanceof(func2, Callable[[D], None]))
+
+        def func3(arg1: (C, B)):
+            pass
+
+        self.assertTrue(isinstanceof(func3, Callable[[B], None]))
+        self.assertTrue(isinstanceof(func3, Callable[[C], None]))
+        self.assertTrue(isinstanceof(func3, Callable[[D], None]))
+
+        def func4() -> C:
+            pass
+
+        self.assertTrue(isinstanceof(func4, Callable[[], B]))
+        self.assertTrue(isinstanceof(func4, Callable[[], C]))
+        self.assertFalse(isinstanceof(func4, Callable[[], D]))
 
 
 def main(argv=None):

@@ -21,6 +21,7 @@ def py_instancecheck(self, obj, **kwargs):
 def py_subclasscheck(self, obj, **kwargs):
     return issubclass(obj, self)
 
+
 def _register(d, *args):
     callback = None
     if len(args) == 1:
