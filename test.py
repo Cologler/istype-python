@@ -46,11 +46,23 @@ class Test(unittest.TestCase):
         self.assertTrue(isinstanceof((1, '1'), Tuple[int, str]))
         self.assertFalse(isinstanceof((1, 1), Tuple[int, str]))
 
+    def _get_ls(self):
+        yield []                # 0
+        yield [1, '1']          # 1
+        yield ['1', 1]          # 2
+        yield [1, 1]            # 3
+
     def test_list(self):
-        self.assertTrue(isinstanceof([1, '1'], list))
-        self.assertTrue(isinstanceof([1, 1], List[int]))
-        self.assertFalse(isinstanceof([1, '1'], List[int]))
-        self.assertTrue(isinstanceof([1, '1'], List[object]))
+        ''' test iterable, list, collection. '''
+        for i, ls in enumerate(self._get_ls()):
+            self.assertTrue(isinstanceof(ls, list))
+
+            for gt in (List, Iterable, Collection):
+                self.assertTrue(isinstanceof(ls, gt[object]))
+                if i in (1, 2):
+                    self.assertFalse(isinstanceof(ls, gt[int]))
+                elif i == 3:
+                    self.assertTrue(isinstanceof(ls, gt[int]))
 
     def test_anystr(self):
         self.assertFalse(isinstanceof([1, '1'], AnyStr))
@@ -78,20 +90,6 @@ class Test(unittest.TestCase):
         self.assertTrue(isinstanceof(TeamUser, Type[User]))
         self.assertFalse(isinstanceof(str, Type[User]))
         self.assertTrue(isinstanceof(str, Type[Any]))
-
-    def test_iterable(self):
-        self.assertTrue(isinstanceof([], Iterable[int]))
-        self.assertTrue(isinstanceof([1, 1], Iterable[int]))
-        self.assertTrue(isinstanceof([1, '1'], list))
-        self.assertFalse(isinstanceof([1, '1'], Iterable[int]))
-        self.assertTrue(isinstanceof([1, '1'], Iterable[object]))
-
-    def test_collection(self):
-        self.assertTrue(isinstanceof([], Collection[int]))
-        self.assertTrue(isinstanceof([1, 1], Collection[int]))
-        self.assertTrue(isinstanceof([1, '1'], list))
-        self.assertFalse(isinstanceof([1, '1'], Collection[int]))
-        self.assertTrue(isinstanceof([1, '1'], Collection[object]))
 
     def test_typevar(self):
         self.assertTrue(isinstanceof([1], List[T], typevar_table={'T': int}))
