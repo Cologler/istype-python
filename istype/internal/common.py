@@ -48,9 +48,7 @@ def isinstanceof(x, types: tuple, *,
     kwargs = dict(
         typevar_table=typevar_table
     )
-    if isinstance(types, tuple):
-        return any(isinstanceof(x, t, **kwargs) for t in types)
-    cls = getattr(types, '__class__', null)
+    cls = type(types)
     return _INSTANCECHECK.get(cls, py_instancecheck)(types, x, **kwargs)
 isinstanceof.register = functools.partial(_register, _INSTANCECHECK)
 
@@ -61,9 +59,7 @@ def issubclassof(x, types, *,
     same as `issubclass()` in python.
     but this function is support the type in `typing`.
     '''
-    if isinstance(types, tuple):
-        return any(issubclassof(x, t) for t in types)
-    cls = getattr(types, '__class__', null)
+    cls = type(types)
     return _SUBCLASSCHECK.get(cls, py_subclasscheck)(types, x)
 issubclassof.register = functools.partial(_register, _SUBCLASSCHECK)
 
