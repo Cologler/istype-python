@@ -9,7 +9,7 @@
 import os
 from setuptools import setup, find_packages
 
-VERSION = '0.1.2.0'
+VERSION = '0.1.2.1'
 DESCRIPTION = ''
 
 long_description = None
@@ -31,7 +31,7 @@ setup(
     author_email='skyoflw@gmail.com',
     url = 'https://github.com/Cologler/istype-python',
     license = 'MIT',
-    packages = ['istype'],
+    packages = find_packages(),
     include_package_data = True,
     zip_safe = False,
     install_requires = [],
