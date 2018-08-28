@@ -8,7 +8,9 @@
 
 from typing import Iterable
 from itertools import zip_longest
-from .internal.common import isinstanceof, issubclassof
+
+from .internal import TypeMatcher
+from .g import isinstanceof, issubclassof
 
 def match(args: (list, tuple), types: Iterable[type]) -> bool:
     '''
@@ -37,6 +39,7 @@ def match(args: (list, tuple), types: Iterable[type]) -> bool:
 
 
 __all__ = [
+    'TypeMatcher',
     'isinstanceof',
     'issubclassof',
     'match'

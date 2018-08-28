@@ -6,83 +6,59 @@
 #
 # ----------
 
-import typing
-import functools
-import collections.abc as abccol
+class MatchContext:
+    def __init__(self):
+        self._type_vars = None
 
-_INSTANCECHECK = {}
-_SUBCLASSCHECK = {}
-
-null = object()
-
-def py_instancecheck(self, obj, **kwargs):
-    return isinstance(obj, self)
-
-def py_subclasscheck(self, obj, **kwargs):
-    return issubclass(obj, self)
+    @property
+    def type_vars(self):
+        if self._type_vars is None:
+            self._type_vars = {}
+        return self._type_vars
 
 
-def _register(d, *args):
-    callback = None
-    if len(args) == 1:
-        cls, = args
-    elif len(args) == 2:
-        cls, callback = args
-    else:
-        raise ValueError
-    def r(cb):
-        d[cls] = cb
-        return cb
-    if callback is None:
-        return r
-    else:
-        r(callback)
-        return callback
+class TypeMatcher:
+    _INSTANCECHECK_HOOKS = {}
+    _SUBCLASSCHECK_HOOKS = {}
 
-def isinstanceof(x, types: tuple, *,
-        typevar_table: typing.Dict[str, type]=None):
-    '''
-    same as `isinstance()` in python.
-    but this function is support the type in `typing`.
-    '''
-    kwargs = dict(
-        typevar_table=typevar_table
-    )
-    cls = type(types)
-    return _INSTANCECHECK.get(cls, py_instancecheck)(types, x, **kwargs)
-isinstanceof.register = functools.partial(_register, _INSTANCECHECK)
+    def __init__(self):
+        self.check_tuple_elements = True
+        self.check_list_elements = True
+        self.check_collection_elements = True
+        self.check_dict_elements = True
+        self.check_set_elements = True
+        self.check_iterable_elements = False
 
+    @staticmethod
+    def python_instancecheck(self, ctx, types: tuple, obj: object):
+        return isinstance(obj, types)
 
-def issubclassof(x, types, *,
-        typevar_table: typing.Dict[str, type]=None):
-    '''
-    same as `issubclass()` in python.
-    but this function is support the type in `typing`.
-    '''
-    cls = type(types)
-    return _SUBCLASSCHECK.get(cls, py_subclasscheck)(types, x)
-issubclassof.register = functools.partial(_register, _SUBCLASSCHECK)
+    @staticmethod
+    def python_subclasscheck(self, ctx, types: tuple, cls: object):
+        return issubclass(cls, types)
 
-# generic collection check:
+    def isinstance(self, obj: object, types: tuple, *, ctx=None):
+        types_cls = type(types)
+        checker = self._INSTANCECHECK_HOOKS.get(types_cls, TypeMatcher.python_instancecheck)
+        return checker(self, ctx, types, obj)
 
-_INSTANCECHECK_COLLECTION_TYPE_MAP = {
-    typing.List: list,
-    typing.Set: set,
-    typing.FrozenSet: frozenset,
-    typing.Collection: abccol.Collection,
-    typing.Iterable: abccol.Iterable,
-}
+    def issubclass(self, obj: object, types: tuple, *, ctx=None):
+        types_cls = type(types)
+        checker = self._SUBCLASSCHECK_HOOKS.get(types_cls, TypeMatcher.python_subclasscheck)
+        return checker(self, ctx, types, obj)
 
-@isinstanceof.register(typing.GenericMeta)
-def genericmeta_instancecheck(self, obj, **kwargs):
-    gorg = getattr(self, '_gorg', null)
-    func = _INSTANCECHECK.get(gorg, null)
-    if func is not null:
-        return func(self, obj, **kwargs)
-    coltype = _INSTANCECHECK_COLLECTION_TYPE_MAP.get(gorg, null)
-    if coltype is not null:
-        if not isinstance(obj, coltype):
-            return False
-        typ, = self.__args__
-        return all(isinstanceof(x, typ, **kwargs) for x in obj)
-    return py_instancecheck(self, obj, **kwargs)
+    @classmethod
+    def hook_instance_check(cls, type_: type):
+        def register(func):
+            assert type_ not in cls._INSTANCECHECK_HOOKS
+            cls._INSTANCECHECK_HOOKS[type_] = func
+            return func
+        return register
+
+    @classmethod
+    def hook_subclass_check(cls, type_: type):
+        def register(func):
+            assert type_ not in cls._SUBCLASSCHECK_HOOKS
+            cls._SUBCLASSCHECK_HOOKS[type_] = func
+            return func
+        return register

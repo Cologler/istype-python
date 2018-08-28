@@ -7,25 +7,33 @@
 # ----------
 
 import typing
-from .common import isinstanceof, issubclassof
 
-@isinstanceof.register(typing.TypeVar)
-def instancecheck(self, obj, **kwargs):
-    args = self.__constraints__
+from .common import TypeMatcher, MatchContext
+
+
+class TypeVarInfo:
+    def __init__(self, type_var):
+        self._type_var = type_var
+        self._type = None
+
+    def update_type(self, matcher: TypeMatcher, ctx: MatchContext, type_):
+        if self._type is not None:
+            if type_.__covariant__:
+                raise NotImplementedError
+            if type_.__contravariant__:
+                raise NotImplementedError
+        self._type = type_
+        return True
+
+
+@TypeMatcher.hook_instance_check(typing.TypeVar)
+def instance_check(self: TypeMatcher, ctx: MatchContext, type_, obj: object):
+    args = type_.__constraints__
     if args:
-        return isinstanceof(obj, args, **kwargs)
-    typevar_table = kwargs.get('typevar_table')
-    if isinstance(typevar_table, dict):
-        typed = typevar_table.get(self.__name__, None)
-        if typed is None:
-            typevar_table[self.__name__] = type(obj)
-            return True
-        else:
-            if self.__contravariant__:
-                return issubclassof(typed, type(obj))
-            return isinstanceof(obj, typed, **kwargs)
-    if self.__covariant__:
-        raise NotImplementedError
-    if self.__contravariant__:
-        raise NotImplementedError
-    return True
+        return self.isinstance(obj, args, ctx=ctx)
+    type_vars = ctx.type_vars
+    type_var_info = type_vars.get(type_.__name__, None)
+    if type_var_info is None:
+        type_vars[type_.__name__] = type_var_info = TypeVarInfo(type_)
+    type_var_info.update_type(type(obj))
+    assert NotImplementedError

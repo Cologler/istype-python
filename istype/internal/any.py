@@ -7,12 +7,13 @@
 # ----------
 
 import typing
-from .common import isinstanceof, issubclassof
 
-@isinstanceof.register(type(typing.Any))
-def instancecheck(self, obj, **kwargs):
+from .common import TypeMatcher
+
+@TypeMatcher.hook_instance_check(type(typing.Any))
+def instance_check(*args):
     return True
 
-@issubclassof.register(type(typing.Any))
-def subclasscheck(self, obj, **kwargs):
+@TypeMatcher.hook_subclass_check(type(typing.Any))
+def subclass_check(*args):
     return True

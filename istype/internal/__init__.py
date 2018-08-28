@@ -9,9 +9,9 @@
 import os
 import importlib
 
+from .common import TypeMatcher
+
 for name in os.listdir(os.path.dirname(__file__)):
-    if not name.endswith('.py'):
-        continue
-    if name == '__init__.py':
+    if name.startswith('_') or not name.endswith('.py'):
         continue
     importlib.import_module('.' + name[:-3], __name__)
