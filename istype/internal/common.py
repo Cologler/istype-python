@@ -7,6 +7,7 @@
 # ----------
 
 import contextlib
+from typing import Union
 
 
 class MatchContext:
@@ -45,21 +46,21 @@ class TypeMatcher:
         self.check_iterable_elements = False
 
     @staticmethod
-    def python_instancecheck(self, ctx, types: tuple, obj: object):
+    def python_instancecheck(self, ctx, types: Union[type, tuple], obj: object) -> bool:
         return isinstance(obj, types)
 
     @staticmethod
-    def python_subclasscheck(self, ctx, types: tuple, cls: object):
+    def python_subclasscheck(self, ctx, types: Union[type, tuple], cls: object) -> bool:
         return issubclass(cls, types)
 
-    def isinstance(self, obj: object, types: tuple, *, ctx=None):
+    def isinstance(self, obj: object, types: Union[type, tuple], *, ctx=None) -> bool:
         types_cls = type(types)
         checker = self._INSTANCECHECK_HOOKS.get(types_cls, TypeMatcher.python_instancecheck)
         ctx = ctx or MatchContext()
         with ctx.then_call(checker):
             return checker(self, ctx, types, obj)
 
-    def issubclass(self, obj: object, types: tuple, *, ctx=None):
+    def issubclass(self, obj: object, types: Union[type, tuple], *, ctx=None) -> bool:
         types_cls = type(types)
         checker = self._SUBCLASSCHECK_HOOKS.get(types_cls, TypeMatcher.python_subclasscheck)
         ctx = ctx or MatchContext()

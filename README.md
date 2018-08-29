@@ -10,9 +10,10 @@ However, we cannot use `isinstance()` for test it.
 So...
 
 ``` py
+from typing import Union
 from istype import isinstanceof
 
-isinstanceof(1, Union[int, str]) # now it will return True
+assert isinstanceof(1, Union[int, str])
 ```
 
 try use `from istype import isinstanceof as isinstance` !
@@ -30,3 +31,15 @@ try use `from istype import isinstanceof as isinstance` !
 * Type
 * Iterable
 * Collection
+
+## Configurable
+
+``` py
+from typing import List
+from istype import TypeMatcher
+
+matcher = TypeMatcher()
+assert not matcher.isinstance([1], List[str])
+matcher.check_list_elements = False
+assert matcher.isinstance([1], List[str]) # now can ignore element checks
+```
