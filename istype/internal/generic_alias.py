@@ -9,27 +9,19 @@
 import typing
 import collections.abc
 
-from .common import TypeMatcher
-from .utils import register_to_dict
-
-_ORIGIN_MAP = {}
-
-register = register_to_dict(_ORIGIN_MAP)
+from .common import TypeMatcher, MatchContext, Router
 
 @TypeMatcher.hook_instance_check(typing._GenericAlias)
-def generic_alias_instance_check(self: TypeMatcher, ctx, type_, obj: object):
-    args = (self, ctx, type_, obj)
-    try:
-        checker = _ORIGIN_MAP[type_.__origin__]
-    except KeyError:
-        return self.python_instancecheck(*args)
-    return checker(*args)
+@Router
+def generic_alias_instance_check(self: TypeMatcher, ctx: MatchContext, type_, obj: object):
+    router: Router = ctx.current_call()
+    return router.get(type_.__origin__, self.python_instancecheck)
 
-@register(typing.Union)
+@generic_alias_instance_check.route(typing.Union)
 def union_instance_check(self: TypeMatcher, ctx, type_, obj: object):
     return self.isinstance(obj, type_.__args__, ctx=ctx)
 
-@register(tuple)
+@generic_alias_instance_check.route(tuple)
 def tuple_instance_check(self: TypeMatcher, ctx, type_, obj: object):
     if not isinstance(obj, tuple):
         return False
@@ -40,7 +32,7 @@ def tuple_instance_check(self: TypeMatcher, ctx, type_, obj: object):
             return False
     return True
 
-@register(dict)
+@generic_alias_instance_check.route(dict)
 def dict_instance_check(self: TypeMatcher, ctx, type_, obj: object):
     if not isinstance(obj, dict):
         return False
@@ -53,7 +45,7 @@ def dict_instance_check(self: TypeMatcher, ctx, type_, obj: object):
                 return False
     return True
 
-@register(set)
+@generic_alias_instance_check.route(set)
 def set_instance_check(self: TypeMatcher, ctx, type_, obj: object):
     if not isinstance(obj, set):
         return False
@@ -63,7 +55,7 @@ def set_instance_check(self: TypeMatcher, ctx, type_, obj: object):
             return False
     return True
 
-@register(list)
+@generic_alias_instance_check.route(list)
 def list_instance_check(self: TypeMatcher, ctx, type_, obj: object):
     if not isinstance(obj, list):
         return False
@@ -73,7 +65,7 @@ def list_instance_check(self: TypeMatcher, ctx, type_, obj: object):
             return False
     return True
 
-@register(collections.abc.Collection)
+@generic_alias_instance_check.route(collections.abc.Collection)
 def collection_instance_check(self: TypeMatcher, ctx, type_, obj: object):
     if not isinstance(obj, collections.abc.Collection):
         return False
@@ -83,7 +75,7 @@ def collection_instance_check(self: TypeMatcher, ctx, type_, obj: object):
             return False
     return True
 
-@register(collections.abc.Iterable)
+@generic_alias_instance_check.route(collections.abc.Iterable)
 def iterable_instance_check(self: TypeMatcher, ctx, type_, obj: object):
     if not isinstance(obj, collections.abc.Iterable):
         return False
@@ -93,14 +85,14 @@ def iterable_instance_check(self: TypeMatcher, ctx, type_, obj: object):
             return False
     return True
 
-@register(type)
+@generic_alias_instance_check.route(type)
 def type_instance_check(self: TypeMatcher, ctx, type_, obj: object):
     if not isinstance(obj, type):
         return False
     inner_type, = type_.__args__
     return self.issubclass(obj, inner_type, ctx=ctx)
 
-@register(typing.ClassVar)
+@generic_alias_instance_check.route(typing.ClassVar)
 def class_var_instance_check(self: TypeMatcher, ctx, type_, obj: object):
     inner_type, = type_.__args__
     return self.isinstance(obj, inner_type, ctx=ctx)

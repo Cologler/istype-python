@@ -6,15 +6,30 @@
 #
 # ----------
 
+import contextlib
+
+
 class MatchContext:
     def __init__(self):
         self._type_vars = None
+        self._route_stack = []
 
     @property
     def type_vars(self):
         if self._type_vars is None:
             self._type_vars = {}
         return self._type_vars
+
+    def then_call(self, func):
+        @contextlib.contextmanager
+        def _():
+            self._route_stack.append(func)
+            yield
+            self._route_stack.pop()
+        return _()
+
+    def current_call(self):
+        return self._route_stack[-1]
 
 
 class TypeMatcher:
@@ -40,12 +55,16 @@ class TypeMatcher:
     def isinstance(self, obj: object, types: tuple, *, ctx=None):
         types_cls = type(types)
         checker = self._INSTANCECHECK_HOOKS.get(types_cls, TypeMatcher.python_instancecheck)
-        return checker(self, ctx, types, obj)
+        ctx = ctx or MatchContext()
+        with ctx.then_call(checker):
+            return checker(self, ctx, types, obj)
 
     def issubclass(self, obj: object, types: tuple, *, ctx=None):
         types_cls = type(types)
         checker = self._SUBCLASSCHECK_HOOKS.get(types_cls, TypeMatcher.python_subclasscheck)
-        return checker(self, ctx, types, obj)
+        ctx = ctx or MatchContext()
+        with ctx.then_call(checker):
+            return checker(self, ctx, types, obj)
 
     @classmethod
     def hook_instance_check(cls, type_: type):
@@ -62,3 +81,27 @@ class TypeMatcher:
             cls._SUBCLASSCHECK_HOOKS[type_] = func
             return func
         return register
+
+
+class Router:
+    def __init__(self, func):
+        self._func = func
+        self._route_paths = {}
+
+    def __call__(self, matcher: TypeMatcher, ctx: MatchContext, type_, obj: object):
+        next_call = self._func(matcher, ctx, type_, obj)
+        with ctx.then_call(next_call):
+            return next_call(matcher, ctx, type_, obj)
+
+    def route(self, key):
+        def _(func):
+            assert key not in self._route_paths
+            self._route_paths[key] = func
+            return func
+        return _
+
+    def get(self, key, d):
+        try:
+            return self._route_paths[key]
+        except KeyError:
+            return d
