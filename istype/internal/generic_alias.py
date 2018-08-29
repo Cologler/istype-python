@@ -33,10 +33,13 @@ def tuple_instance_check(self: TypeMatcher, ctx, type_, obj: object):
     return True
 
 @generic_alias_instance_check.route(dict)
-def dict_instance_check(self: TypeMatcher, ctx, type_, obj: object):
-    if not isinstance(obj, dict):
+@generic_alias_instance_check.route(collections.abc.Mapping)
+@generic_alias_instance_check.route(collections.abc.MutableMapping)
+def mapping_instance_check(self: TypeMatcher, ctx, type_, obj: object):
+    if not isinstance(obj, type_.__origin__):
         return False
-    if self.check_dict_elements:
+    name = type_.__origin__.__name__.lower()
+    if getattr(self, f'check_{name}_elements'):
         k_type, v_type = type_.__args__
         for k, v in obj.items():
             if not self.isinstance(k, k_type, ctx=ctx):
@@ -45,41 +48,16 @@ def dict_instance_check(self: TypeMatcher, ctx, type_, obj: object):
                 return False
     return True
 
-@generic_alias_instance_check.route(set)
-def set_instance_check(self: TypeMatcher, ctx, type_, obj: object):
-    if not isinstance(obj, set):
-        return False
-    if self.check_set_elements:
-        el_type = type_.__args__[0]
-        if any(not self.isinstance(x, el_type, ctx=ctx) for x in obj):
-            return False
-    return True
-
 @generic_alias_instance_check.route(list)
-def list_instance_check(self: TypeMatcher, ctx, type_, obj: object):
-    if not isinstance(obj, list):
-        return False
-    if self.check_list_elements:
-        el_type = type_.__args__[0]
-        if any(not self.isinstance(x, el_type, ctx=ctx) for x in obj):
-            return False
-    return True
-
+@generic_alias_instance_check.route(set)
+@generic_alias_instance_check.route(frozenset)
 @generic_alias_instance_check.route(collections.abc.Collection)
-def collection_instance_check(self: TypeMatcher, ctx, type_, obj: object):
-    if not isinstance(obj, collections.abc.Collection):
-        return False
-    if self.check_collection_elements:
-        el_type = type_.__args__[0]
-        if any(not self.isinstance(x, el_type, ctx=ctx) for x in obj):
-            return False
-    return True
-
 @generic_alias_instance_check.route(collections.abc.Iterable)
-def iterable_instance_check(self: TypeMatcher, ctx, type_, obj: object):
-    if not isinstance(obj, collections.abc.Iterable):
+def collections_instance_check(self: TypeMatcher, ctx, type_, obj: object):
+    if not isinstance(obj, type_.__origin__):
         return False
-    if self.check_iterable_elements:
+    name = type_.__origin__.__name__.lower()
+    if getattr(self, f'check_{name}_elements'):
         el_type = type_.__args__[0]
         if any(not self.isinstance(x, el_type, ctx=ctx) for x in obj):
             return False

@@ -37,20 +37,24 @@ class TypeMatcher:
     _INSTANCECHECK_HOOKS = {}
     _SUBCLASSCHECK_HOOKS = {}
 
-    def __init__(self):
-        self.check_tuple_elements = True
-        self.check_list_elements = True
-        self.check_collection_elements = True
-        self.check_dict_elements = True
-        self.check_set_elements = True
-        self.check_iterable_elements = False
+    check_tuple_elements = True
+
+    check_list_elements = True
+    check_collection_elements = True
+    check_set_elements = True
+    check_frozenset_elements = True
+    check_iterable_elements = False
+
+    check_dict_elements = True
+    check_mapping_elements = True
+    check_mutablemapping_elements = True
 
     @staticmethod
     def python_instancecheck(self, ctx, types: Union[type, tuple], obj: object) -> bool:
         return isinstance(obj, types)
 
     @staticmethod
-    def python_subclasscheck(self, ctx, types: Union[type, tuple], cls: object) -> bool:
+    def python_subclasscheck(self, ctx, types: Union[type, tuple], cls: type) -> bool:
         return issubclass(cls, types)
 
     def isinstance(self, obj: object, types: Union[type, tuple], *, ctx=None) -> bool:
