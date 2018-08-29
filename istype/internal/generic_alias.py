@@ -99,3 +99,8 @@ def type_instance_check(self: TypeMatcher, ctx, type_, obj: object):
         return False
     inner_type, = type_.__args__
     return self.issubclass(obj, inner_type, ctx=ctx)
+
+@register(typing.ClassVar)
+def class_var_instance_check(self: TypeMatcher, ctx, type_, obj: object):
+    inner_type, = type_.__args__
+    return self.isinstance(obj, inner_type, ctx=ctx)
