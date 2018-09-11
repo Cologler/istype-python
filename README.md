@@ -1,5 +1,7 @@
 # istype
 
+[![Build Status](https://travis-ci.com/Cologler/istype-python.svg?branch=master)](https://travis-ci.com/Cologler/istype-python)
+
 After python 3.5, we got a `typing` module.
 
 ## Usage
