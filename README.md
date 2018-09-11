@@ -2,9 +2,11 @@
 
 [![Build Status](https://travis-ci.com/Cologler/istype-python.svg?branch=master)](https://travis-ci.com/Cologler/istype-python)
 
-After python 3.5, we got a `typing` module.
+Support python version: `3.6`, `3.7`.
 
 ## Usage
+
+After python 3.5, we got a `typing` module.
 
 We known `typing.Union[int, str]` mean the type is one of `int` or `str`.
 However, we cannot use `isinstance()` for test it.
@@ -18,7 +20,7 @@ from istype import isinstanceof
 assert isinstanceof(1, Union[int, str])
 ```
 
-try use `from istype import isinstanceof as isinstance` !
+You can use `from istype import isinstanceof as isinstance` to replace the builtins `isinstance`.
 
 ## Supported types
 
