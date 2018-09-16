@@ -6,3 +6,10 @@ python:
   - "3.7"
 script:
   - python -m pytest
+deploy:
+  provider: pypi
+  user: "conanvista"
+  password:
+    secure: "HHXcrG4a6ztkOjBB2Hf8T/CxmPgW6YIIl+pV/loCAKuk+Igqg+d2tfclYqeNlVDjqrUaO9gmOW+w2WcFNQxo/WWmCRgHaxQq7l7qnjI06ye70qWNQIg+MXKn0a//V2ZQBhFRdcvgP6DsscWlWtCazX36YK3UuLQUZ04ZWAlpLjjeLFphph6CycIZ1iQlIswTn5iFX3ZettPUGFIVlW0q5emVOjYZc5fkRYN50OdTVZVDmLMSqh5oQVc10tetdeqBHVNgiA1sBZ3KHD8cG7W1Z5vo5WKixtkGYzcc0jJQP20ck1oijA8njXhw35ORrXB5DG+CgJjA/BBWhSRhhahC7y0IuytzZuJ/+550PBhMnvK2HPSl443XWP3D1H4z1NAYGLFAzOxSH8os1Pu3pXLAmD8SuaH4z7G1jmllG+XWIdn7gF5XlC3DqKwjAArqgQOcsa7A6N/p9liOMJPkjrGy/hFzF/ZrxGjo7WTSFr1FX3S6P8qCTXFHeaQAgPMrmLoLkJDqEHO0h7RmZGmKkCFqEXTaFHFWgPhr7ztRIjJ44xmsvGsgqOZNl2nNa1ZtBXgtzjjvVJ7CxZaecUojLRLxa2a6jHjVjcO9M18SM4GFk6yCRkkf1/IuymCsfuTdtDHhh+k3zCkx0u0eztMDDpLkFhWbATZYO+utE4O2V8kUkOs="
+  on:
+    tags: true
