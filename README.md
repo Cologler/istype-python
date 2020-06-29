@@ -2,7 +2,11 @@
 
 [![Build Status](https://travis-ci.com/Cologler/istype-python.svg?branch=master)](https://travis-ci.com/Cologler/istype-python)
 
-Support python version: `3.6`, `3.7`.
+Support python version: 
+
+- 3.6
+- 3.7
+- 3.8
 
 ## Usage
 
